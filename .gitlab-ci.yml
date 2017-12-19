@@ -13,7 +13,7 @@ QA环境:
         - docker tag $PROJECT_NAME:${VERSION} $DOCKER_HUB_NAME/$PROJECT_NAME:${VERSION}
         - docker push $DOCKER_HUB_NAME/$PROJECT_NAME:${VERSION}
         - echo '新镜像已生成，开始部署到各目标机上...'
-        - ansible-playbook deploy/qa.yml -i deploy/hosts --extra-vars "ref=qa"
+        - ansible-playbook deploy/qa.yml -i deploy/hosts --extra-vars "ref=$VERSION"
     only:
         - qa
     when: manual
