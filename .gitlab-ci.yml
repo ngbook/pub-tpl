@@ -1,0 +1,69 @@
+variables:
+    PROJECT_NAME: "ngbook-pub-tpl" # 该项目名
+    DOCKER_HUB_NAME: "ngbook" # docker-hub 上的用户名
+
+before_script:
+    - eval export VERSION=${CI_BUILD_REF:0:8}
+
+测试环境:
+    type: deploy
+    script:
+        - echo "开始编译新镜像：${PROJECT_NAME}:${VERSION} ..."
+        - docker build -t $PROJECT_NAME:$VERSION .
+        - docker tag $PROJECT_NAME:$VERSION $DOCKER_HUB_NAME/$PROJECT_NAME:$VERSION
+        - docker push $DOCKER_HUB_NAME/$PROJECT_NAME:$VERSION
+        - echo '新镜像已生成，开始部署到各目标机上...'
+        - ansible-playbook deploy/dev.yml -i deploy/hosts --extra-vars "ref=$VERSION"
+    only:
+        - dev
+    when: manual
+    tags:
+        - runner-102-51
+
+
+预发布环境:
+    type: deploy
+    script:
+        - echo "开始编译新镜像：${PROJECT_NAME}:${VERSION} ..."
+        - docker build -t $PROJECT_NAME:${VERSION} .
+        - docker tag $PROJECT_NAME:${VERSION} $DOCKER_HUB_NAME/$PROJECT_NAME:${VERSION}
+        - docker push $DOCKER_HUB_NAME/$PROJECT_NAME:${VERSION}
+        - echo '新镜像已生成，开始部署到各目标机上...'
+        - ansible-playbook deploy/stg.yml -i deploy/hosts --extra-vars "ref=stg"
+    only:
+        - stg
+    when: manual
+    tags:
+        - runner-102-51
+
+
+生产环境-灰度发布: # 只发布一台看看有没有问题
+    type: deploy
+    script:
+        - echo "开始编译新镜像：${PROJECT_NAME}:${VERSION} ..."
+        - docker build -t $PROJECT_NAME:$VERSION .
+        - docker tag $PROJECT_NAME:$VERSION $DOCKER_HUB_NAME/$PROJECT_NAME:$VERSION
+        - docker push $DOCKER_HUB_NAME/$PROJECT_NAME:$VERSION
+        - echo '新镜像已生成，开始部署到各目标机上...'
+        - ansible-playbook deploy/prod.yml -i deploy/hosts --extra-vars "ref=$VERSION"
+    only:
+        - prod
+    when: manual
+    tags:
+        - runner-102-51
+
+
+生产环境-全量发布: # 全量发布所有的生产服务器
+    type: deploy
+    script:
+        - echo "开始编译新镜像：${PROJECT_NAME}:${VERSION} ..."
+        - docker build -t $PROJECT_NAME:$VERSION .
+        - docker tag $PROJECT_NAME:$VERSION $DOCKER_HUB_NAME/$PROJECT_NAME:$VERSION
+        - docker push $DOCKER_HUB_NAME/$PROJECT_NAME:$VERSION
+        - echo '新镜像已生成，开始部署到各目标机上...'
+        - ansible-playbook deploy/prod.yml -i deploy/prod-hosts --extra-vars "ref=$VERSION"
+    only:
+        - prod
+    when: manual
+    tags:
+        - runner-102-51
