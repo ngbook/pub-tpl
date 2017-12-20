@@ -19,8 +19,24 @@ before_script:
         - echo '新镜像已生成，开始部署到各目标机上...'
         - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ENV=test REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME CONTAINER_PORT=$CONTAINER_PORT"
     only:
-        - dev
+        - test
     when: always
+    tags:
+        - frontend
+
+
+QA环境:
+    type: deploy
+    script:
+        - echo "开始编译新镜像：${IMAGE} ..."
+        - docker build -t $IMAGE .
+        - docker tag $IMAGE $REMOTE_IMAGE
+        - docker push $REMOTE_IMAGE
+        - echo '新镜像已生成，开始部署到各目标机上...'
+        - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ENV=qa REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME CONTAINER_PORT=$CONTAINER_PORT"
+    only:
+        - qa
+    when: manual
     tags:
         - frontend
 
