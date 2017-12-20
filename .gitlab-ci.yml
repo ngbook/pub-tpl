@@ -1,13 +1,13 @@
 variables:
     PROJECT_NAME: "ngbook-pub-tpl" # 该项目名
-    DOCKER_HUB_NAME: "ngbook" # docker-hub 上的用户名
+    DOCKER_HUB_REGISTRY: "ngbook" # docker registry 上的用户名
     CONTAINER_NAME: "ngbook-pub-tpl" # 运行起来的docker容器名
     CONTAINER_PORT: 12345 # docker容器运行的端口号
 
 before_script:
     - eval export VERSION=${CI_BUILD_REF:0:8}
     - eval export IMAGE=$PROJECT_NAME:$VERSION
-    - eval export REMOTE_IMAGE=$DOCKER_HUB_NAME/$IMAGE
+    - eval export REMOTE_IMAGE=$DOCKER_HUB_REGISTRY/$IMAGE
 
 预发布环境:
     type: deploy
