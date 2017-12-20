@@ -1,21 +1,25 @@
 variables:
     PROJECT_NAME: "ngbook-pub-tpl" # 该项目名
     DOCKER_HUB_NAME: "ngbook" # docker-hub 上的用户名
+    CONTAINER_NAME: "ngbook-pub-tpl" # 运行起来的docker容器名
+    CONTAINER_PORT: 12345 # docker容器运行的端口号
 
 before_script:
     - eval export VERSION=${CI_BUILD_REF:0:8}
+    - eval export IMAGE=$PROJECT_NAME:$VERSION
+    - eval export REMOTE_IMAGE=$DOCKER_HUB_NAME/$IMAGE
 
 QA环境:
     type: deploy
     script:
-        - echo "开始编译新镜像：${PROJECT_NAME}:${VERSION} ..."
-        - docker build -t $PROJECT_NAME:${VERSION} .
-        - docker tag $PROJECT_NAME:${VERSION} $DOCKER_HUB_NAME/$PROJECT_NAME:${VERSION}
-        - docker push $DOCKER_HUB_NAME/$PROJECT_NAME:${VERSION}
+        - echo "开始编译新镜像：${IMAGE} ..."
+        - docker build -t $IMAGE .
+        - docker tag $IMAGE $REMOTE_IMAGE
+        - docker push $REMOTE_IMAGE
         - echo '新镜像已生成，开始部署到各目标机上...'
-        - ansible-playbook deploy/qa.yml -i deploy/hosts --extra-vars "ref=$VERSION"
+        - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ENV=stg REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME CONTAINER_PORT=$CONTAINER_PORT"
     only:
-        - qa
+        - stg
     when: manual
     tags:
-        - runner-102-51
+        - frontend
