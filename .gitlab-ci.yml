@@ -1,6 +1,6 @@
 variables:
     PROJECT_NAME: "ngbook-pub-tpl" # 该项目名
-    DOCKER_HUB_REGISTRY: "ngbook" # docker registry 上的用户名
+    DOCKER_HUB_REGISTRY: "ngbook" # docker registry地址或 docker hub用户名
     CONTAINER_NAME: "ngbook-pub-tpl" # 运行起来的docker容器名
     CONTAINER_PORT: 12345 # docker容器运行的端口号
 
