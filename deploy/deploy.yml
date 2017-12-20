@@ -1,5 +1,5 @@
 ---
-- hosts: develop 
+- hosts: "{{ENV | default('test')}}"
   remote_user: developer
   tasks:
   - name: 拉取远程镜像
