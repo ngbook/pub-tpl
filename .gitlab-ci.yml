@@ -1,8 +1,8 @@
 variables:
     PROJECT_NAME: "ngbook-pub-tpl" # 该项目名
-    DOCKER_HUB_REGISTRY: "172.16.102.51:5002/dev" # docker registry地址或 docker hub用户名
+    DOCKER_HUB_REGISTRY: "ngbook" # docker registry地址或 docker hub用户名
     CONTAINER_NAME: "pub-tpl-test" # 运行起来的docker容器名
-    CONTAINER_PORT: 27545 # docker容器运行的端口号
+    CONTAINER_PORT: 12345 # docker容器运行的端口号
 
 before_script:
     - eval export VERSION=${CI_BUILD_REF:0:8}
@@ -19,7 +19,7 @@ before_script:
         - echo '新镜像已生成，开始部署到各目标机上...'
         - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ENV=test REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME CONTAINER_PORT=$CONTAINER_PORT"
     only:
-        - dev
+        - test
     when: always
     tags:
-        - runner-102-51
+        - frontend
