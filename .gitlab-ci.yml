@@ -17,57 +17,57 @@ before_script:
         - docker tag $IMAGE $REMOTE_IMAGE
         - docker push $REMOTE_IMAGE
         - echo '新镜像已生成，开始部署到各目标机上...'
-        - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME"
+        - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ENV=test REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME CONTAINER_PORT=$CONTAINER_PORT"
     only:
         - dev
-    when: manual
+    when: always
     tags:
-        - runner-102-51
+        - frontend
 
 
 预发布环境:
     type: deploy
     script:
-        - echo "开始编译新镜像：${PROJECT_NAME}:${VERSION} ..."
-        - docker build -t $PROJECT_NAME:${VERSION} .
-        - docker tag $PROJECT_NAME:${VERSION} $DOCKER_HUB_NAME/$PROJECT_NAME:${VERSION}
-        - docker push $DOCKER_HUB_NAME/$PROJECT_NAME:${VERSION}
+        - echo "开始编译新镜像：${IMAGE} ..."
+        - docker build -t $IMAGE .
+        - docker tag $IMAGE $REMOTE_IMAGE
+        - docker push $REMOTE_IMAGE
         - echo '新镜像已生成，开始部署到各目标机上...'
-        - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ref=stg"
+        - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ENV=stg REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME CONTAINER_PORT=$CONTAINER_PORT"
     only:
         - stg
     when: manual
     tags:
-        - runner-102-51
+        - frontend
 
 
 生产环境-灰度发布: # 只发布一台看看有没有问题
     type: deploy
     script:
-        - echo "开始编译新镜像：${PROJECT_NAME}:${VERSION} ..."
+        - echo "开始编译新镜像：${IMAGE} ..."
         - docker build -t $IMAGE .
         - docker tag $IMAGE $REMOTE_IMAGE
         - docker push $REMOTE_IMAGE
         - echo '新镜像已生成，开始部署到各目标机上...'
-        - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ref=$VERSION"
+        - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ENV=prod REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME CONTAINER_PORT=$CONTAINER_PORT"
     only:
         - prod
     when: manual
     tags:
-        - runner-102-51
+        - frontend
 
 
 生产环境-全量发布: # 全量发布所有的生产服务器
     type: deploy
     script:
-        - echo "开始编译新镜像：${PROJECT_NAME}:${VERSION} ..."
+        - echo "开始编译新镜像：${IMAGE} ..."
         - docker build -t $IMAGE .
         - docker tag $IMAGE $REMOTE_IMAGE
         - docker push $REMOTE_IMAGE
         - echo '新镜像已生成，开始部署到各目标机上...'
-        - ansible-playbook deploy/deploy.yml -i deploy/prod-hosts --extra-vars "ref=$VERSION"
+        - ansible-playbook deploy/deploy.yml -i deploy/prod-hosts --extra-vars "ENV=prod REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME CONTAINER_PORT=$CONTAINER_PORT"
     only:
         - prod
     when: manual
     tags:
-        - runner-102-51
+        - frontend
