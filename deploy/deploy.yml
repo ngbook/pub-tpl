@@ -4,8 +4,8 @@
   tasks:
   - name: 拉取远程镜像
     command: docker pull {{REMOTE_IMAGE}}
-  - name: 停止并移除旧的容器
+  - name: 停止并移除旧的docker容器
     command: docker stop {{CONTAINER_NAME}} && docker rm {{CONTAINER_NAME}}
     ignore_errors: True
-  - name: run new container
+  - name: 运行起新的docker容器
     command: docker run -d --restart=always --name {{CONTAINER_NAME}} -p {{CONTAINER_PORT}}:80 {{REMOTE_IMAGE}}
