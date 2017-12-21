@@ -1,2 +1,2 @@
 # 发布代码模板  
-from https://github.com/ngbook/pub-tpl  
+把当前代码拉到 publish 目录下即可  
