@@ -17,9 +17,9 @@ QA环境:
         - docker tag $IMAGE $REMOTE_IMAGE
         - docker push $REMOTE_IMAGE
         - echo '新镜像已生成，开始部署到各目标机上...'
-        - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ENV=stg REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME CONTAINER_PORT=$CONTAINER_PORT"
+        - ansible-playbook deploy/deploy.yml -i deploy/hosts --extra-vars "ENV=qa REMOTE_IMAGE=$REMOTE_IMAGE CONTAINER_NAME=$CONTAINER_NAME CONTAINER_PORT=$CONTAINER_PORT"
     only:
-        - stg
+        - qa
     when: manual
     tags:
         - frontend
